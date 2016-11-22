@@ -4,6 +4,7 @@ using System.IO;
 //using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Collections.Generic;
 namespace TcpEchoClient
 {
 	class TcpEchoClient
@@ -21,16 +22,27 @@ namespace TcpEchoClient
 				StreamReader reader = new StreamReader (stream);
 				StreamWriter writer = new StreamWriter (stream) { AutoFlush = true };
 
-				Console.Write ("Enter to send: ");
-				string lineToSend = "hej fra sagen";
-				Console.WriteLine ("Sending to server: " + lineToSend);
-				writer.WriteLine (lineToSend);
-				string lineReceived = reader.ReadLine ();
-				Console.WriteLine ("Received from server: " + lineReceived);
+
+
+
+
+				while (true) {
+					
+					Console.Write("Enter to send: ");
+
+					string lineToSend = Console.ReadLine();
+					Console.WriteLine("Sending to server: " + Console.ReadLine());
+					writer.WriteLine(lineToSend);
+					string lineReceived = reader.ReadLine();
+					Console.WriteLine("Received from server: " + lineReceived);
+				}
+
 
 			} catch {
 				Console.WriteLine ("failed");
 			}
+
+
 		}
 	}
 }
