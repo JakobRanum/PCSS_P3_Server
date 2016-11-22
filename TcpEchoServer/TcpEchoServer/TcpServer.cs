@@ -13,8 +13,7 @@ namespace TcpEchoServer
 {
 	
 
-	public class TcpEchoServer
-	{
+	public class TcpEchoServer{
 
 		public static void sender (object argument){
 			TcpClient client = (TcpClient)argument;
@@ -31,7 +30,6 @@ namespace TcpEchoServer
 				}
 
 				while (client.Connected){
-
 					if (messages.Count > messagesSend){
 						try{
 							writer.WriteLine("i got: " + messages.ElementAt(messages.Count-1));
@@ -48,15 +46,13 @@ namespace TcpEchoServer
 
 			}
 
-			catch (ThreadAbortException)
-			{
+			catch (ThreadAbortException){
 				client.Close();
 				Console.WriteLine("Connection error...");
 				Thread.Sleep(2000);
 			}
 
-			finally
-			{
+			finally{
 				Console.WriteLine("finally");
 			}
 		}
