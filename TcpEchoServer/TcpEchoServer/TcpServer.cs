@@ -16,62 +16,98 @@ namespace TcpEchoServer
 	public class TcpEchoServer
 	{
 
-		// Counting a's! 
-		public static void countFunction (object argument)
-		{
-			TcpClient client = (TcpClient)argument; 
+		public static void sender (object argument){
+			TcpClient client = (TcpClient)argument;
 
-			try {
+			try{
 				StreamWriter writer = new StreamWriter(client.GetStream(), Encoding.ASCII) { AutoFlush = true };
-				StreamReader reader = new StreamReader(client.GetStream(), Encoding.ASCII);
-
-				Console.WriteLine("Trying to connect with client"); 
-			} 
-
-			catch (ThreadAbortException) {
-				Console.WriteLine ("Connection error...");
-				Thread.Sleep (2000); 
-			}
-
-			finally{
-				Console.WriteLine("Client connected");
-				StreamWriter writer = new StreamWriter(client.GetStream(), Encoding.ASCII) { AutoFlush = true };
-				StreamReader reader = new StreamReader(client.GetStream(), Encoding.ASCII);
 
 				int messagesSend = 0;
+				messages.Add("Welcome to chatRoom Ofir");
 
-
-
-				messages.Add("her en gamle beskeder");
-				messages.Add("mere pis");
-
-				Console.WriteLine("now sending messages");
 				foreach (var message in messages){
 					messagesSend++;
 					writer.WriteLine("i got: " + message);
 				}
 
-				Console.WriteLine("Now listening to client");
+				while (client.Connected){
 
-				while (true){
-					//Console.WriteLine("Recieved message: " + reader.ReadLine());
-					if (reader.ReadLine() != null) {
-						messages.Add(reader);
-						writer.WriteLine("i got: " + messages.ElementAt(messages.Count-1));
+					if (messages.Count > messagesSend){
+						try{
+							writer.WriteLine("i got: " + messages.ElementAt(messages.Count-1));
+							messagesSend++;
+						}
+						catch{
+							Console.WriteLine("error, client disconnected");
+						}
 					}
 
-					//if (messages.Count > messagesSend) {
-					//	writer.WriteLine("i got: " + messages.ElementAt(messagesSend));
-					//	messagesSend++;
-					//}
-
 				}
-				Console.WriteLine("Closing connection");
-				reader.Close();
-				writer.Close();
+
+				//Console.WriteLine("Client disconnected sender");
+
+			}
+
+			catch (ThreadAbortException)
+			{
 				client.Close();
+				Console.WriteLine("Connection error...");
+				Thread.Sleep(2000);
+			}
+
+			finally
+			{
+				Console.WriteLine("finally");
 			}
 		}
+
+
+
+
+
+		public static void reciever(object argument) {
+			TcpClient client = (TcpClient)argument;
+
+			try{
+				StreamReader reader = new StreamReader(client.GetStream(), Encoding.ASCII);
+
+				Console.WriteLine("Now listening to client");
+
+				while (client.Connected) {
+					if (true) {
+						try{
+							string message = reader.ReadLine();
+							if (message != null){
+								messages.Add(message);
+							}
+							Console.WriteLine(messages.ElementAt(messages.Count-1));
+						}
+						catch{
+							reader.Close();
+							client.Close();
+							Console.WriteLine("Connection Error");
+							break;
+						}
+					}
+				}
+				Console.WriteLine("Client disconnected");
+
+			}
+
+			catch (ThreadAbortException){
+				client.Close();
+				Console.WriteLine("Connection error...");
+			}
+
+			finally{
+				Console.WriteLine("finally");
+			}
+		}
+
+
+
+
+
 
 		public static List<String> messages = new List<string>();
 
@@ -82,16 +118,24 @@ namespace TcpEchoServer
 
 			int port = 11000;
 			int nameId = 0;
-			IPAddress myIp = IPAddress.Parse ("192.168.0.14");
+			IPAddress myIp = IPAddress.Parse ("192.168.0.11");
 
 			TcpListener listener = new TcpListener (myIp, port);
+
 			listener.Start ();
 
 			while (true) { 
 				TcpClient client = listener.AcceptTcpClient ();
-				Thread thread = new Thread (countFunction);
-				thread.Name = nameId.ToString();
-				thread.Start (client);
+
+				//sender thread created and started
+				Thread senderThread = new Thread(sender);
+				senderThread.Name = nameId.ToString();
+				senderThread.Start(client);
+
+				//reciever thread created and started
+				Thread recieverThread = new Thread(reciever);
+				recieverThread.Name = nameId.ToString();
+				recieverThread.Start(client);
 
 				nameId++;
 
