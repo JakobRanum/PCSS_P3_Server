@@ -24,16 +24,17 @@ namespace TcpEchoClient
 
 
 
-				Console.Write ("Enter to send: ");
-				string lineToSend = "sker der";
-				Console.WriteLine ("Sending to server: " + Console.ReadLine());
-				writer.WriteLine (lineToSend);
+
 
 				while (true) {
-					if(reader.ReadLine () != null){
-						string lineReceived = reader.ReadLine ();
-						Console.WriteLine ("Received from server: " + lineReceived);
-					}
+					
+					Console.Write("Enter to send: ");
+
+					string lineToSend = Console.ReadLine();
+					Console.WriteLine("Sending to server: " + Console.ReadLine());
+					writer.WriteLine(lineToSend);
+					string lineReceived = reader.ReadLine();
+					Console.WriteLine("Received from server: " + lineReceived);
 				}
 
 
