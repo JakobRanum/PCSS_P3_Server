@@ -24,9 +24,12 @@ namespace TcpEchoClient
 
 
 				while (true) {
-					string lineReceived = reader.ReadLine();
-					Console.WriteLine("Received from server: " + lineReceived);
+					string inp = Console.ReadLine();
+					writer.WriteLine(inp);
+					//string lineReceived = reader.ReadLine();
+					//Console.WriteLine("Received from server: " + lineReceived);
 				}
+
 
 
 			} catch {
