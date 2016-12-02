@@ -11,6 +11,11 @@ namespace TcpEchoServer
 {
 	public class TcpEchoServer
 	{
+		//global list containing all messages in the chatroom
+		public static List<String> messages = new List<string>();
+
+
+		//function run by the threads for sending messages from the client
 		public static void sender(object argument)
 		{
 			TcpClient client = (TcpClient)argument;
@@ -21,7 +26,7 @@ namespace TcpEchoServer
 
 				int messagesSend = 0;
 
-				messages.Add("Welcome to the P3 chatroom");
+
 
 				foreach (var message in messages)
 				{ //sending old messages.
@@ -31,6 +36,7 @@ namespace TcpEchoServer
 
 				while (client.Connected)
 				{
+					//if new messages are added to the messages list by other clients they are pulled to this client as well
 					if (messages.Count > messagesSend)
 					{
 						try
@@ -56,15 +62,14 @@ namespace TcpEchoServer
 				Thread.Sleep(2000);
 			}
 
-			finally
-			{
-				Console.WriteLine("finally");
-			}
 		}
 
+		//function run by the threads for recieving messages from the client
 		public static void reciever(object argument)
 		{
 			TcpClient client = (TcpClient)argument;
+
+
 			try
 			{
 				StreamReader reader = new StreamReader(client.GetStream(), Encoding.ASCII);
@@ -104,9 +109,12 @@ namespace TcpEchoServer
 			}
 		}
 
-		public static List<String> messages = new List<string>();
+		//main executing the server program
 		public static void Main()
 		{
+			//adding welcome message to messages list
+			messages.Add("Welcome to the P3 chatroom");
+
 			TcpListener listener;
 			try
 			{
@@ -114,6 +122,7 @@ namespace TcpEchoServer
 
 				foreach (var addr in Dns.GetHostEntry(string.Empty).AddressList)
 				{
+					//current ip adress retrieved
 					if (addr.AddressFamily == AddressFamily.InterNetwork)
 					{
 						currentIP = addr.ToString();
@@ -130,17 +139,32 @@ namespace TcpEchoServer
 				listener.Start();
 
 				Console.WriteLine("Server started, listening for clients on port: '{0}'", port);
+
+				//Multi threading for multiple clients
 				while (true)
 				{
+					//listening for new clients
 					TcpClient client = listener.AcceptTcpClient();
-					//sender thread created and started
+
+					//sender thread created
 					Thread senderThread = new Thread(sender);
+
+					//sender thread is named for reference
 					senderThread.Name = nameId.ToString();
+
+					//sender thread started with the newly connected client as argument
 					senderThread.Start(client);
-					//reciever thread created and started
+
+					//reciever thread created
 					Thread recieverThread = new Thread(reciever);
+
+					//reciever thread is named for reference
 					recieverThread.Name = nameId.ToString();
+
+					//reciever thread started with the newly connected client as argument
 					recieverThread.Start(client);
+
+					//nametag iterated
 					nameId++;
 				}
 			}
