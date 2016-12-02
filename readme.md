@@ -2,7 +2,7 @@
 **Guide:**
 - Navigate to /TcpEchoServer/ And open TcpEchoServer.sln
 - Pull the [client side unity project](https://github.com/JakobRanum/PCSS_P3_Client)
-- Login with the given *server IP adress*
+- Login with the given *server IP address*
 
 **Notice**
 The contributors graph data is **not** reflecting the correct amount of commits / line adds.
